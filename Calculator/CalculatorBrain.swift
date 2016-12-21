@@ -11,6 +11,7 @@ import Foundation
 class CalculatorBrain {
     
     private var accumulator = 0.0
+    private var pending: PendingBinary?
     
     func setOperand(operand: Double) {
         accumulator = operand
@@ -38,13 +39,18 @@ class CalculatorBrain {
             switch operation {
             case .Constant(let value): accumulator = value
             case .UnaryOperation(let function): accumulator = function(accumulator)
-                
+            case .BinaryOperation(let function): pending = PendingBinary(binaryFunction: function,firstOperand: accumulator)
+            case .Equals:
+                if pending != nil {
+                    accumulator = pending!.binaryFunction(pending!.firstOperand,accumulator)
+                    pending = nil
+                }
             }
         }
     }
     
     struct PendingBinary {
-        var BinaryFunction: (Double,Double) -> Double
+        var binaryFunction: (Double,Double) -> Double
         var firstOperand: Double
     }
     
