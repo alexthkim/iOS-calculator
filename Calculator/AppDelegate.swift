@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Calculator
 //
-//  Created by Alexander Kim on 12/20/16.
+//  Created by Alexander Kim on 12/19/16.
 //  Copyright © 2016 Alexander Kim. All rights reserved.
 //
 
