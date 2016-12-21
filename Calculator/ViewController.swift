@@ -9,13 +9,14 @@
 import UIKit
 
 class ViewController: UIViewController {
-
-    @IBOutlet weak var display: UILabel!
     
-    var userInMiddleOfTyping = false
-    var usingDotButton = false
+    @IBOutlet private weak var display: UILabel!
     
-    @IBAction func touchDigit(_ sender: UIButton) {
+    private var userInMiddleOfTyping = false
+    private var usingDotButton = false
+    private var previousNumber = 0
+    
+    @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         //print("touched the \(digit) digit")
         if userInMiddleOfTyping {
@@ -26,23 +27,36 @@ class ViewController: UIViewController {
         }
         userInMiddleOfTyping = true
     }
-
-    @IBAction func usingDot(_ sender: UIButton) {
+    
+    @IBAction private func usingDot(_ sender: UIButton) {
         if !usingDotButton {
             usingDotButton = true
             let textCurrent = display.text!
             display.text = textCurrent + "."
         }
     }
-
-    @IBAction func performOperation(_ sender: UIButton) {
-        userInMiddleOfTyping = false
-        usingDotButton = false
-        if let mathOp = sender.currentTitle {
-            if mathOp == "π" {
-                display.text = String(M_PI)
-            }
+    
+    private var displayValue: Double {
+        get {
+            return Double(display.text!)!
         }
+        set {
+            display.text = String(newValue)
+        }
+    }
+    
+    private var brain = CalculatorBrain()
+    
+    @IBAction private func performOperation(_ sender: UIButton) {
+        if userInMiddleOfTyping {
+            brain.setOperand(operand: displayValue)
+            userInMiddleOfTyping = false
+        }
+        
+        if let mathOp = sender.currentTitle {
+            brain.performOperation(symbol: mathOp)
+        }
+        displayValue = brain.result
     }
 }
 
