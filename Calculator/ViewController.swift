@@ -12,6 +12,8 @@ class ViewController: UIViewController {
     
     @IBOutlet private weak var display: UILabel!
     
+    @IBOutlet weak var displayOrder: UILabel!
+    
     private var userInMiddleOfTyping = false
     private var usingDotButton = false
     private var previousNumber = 0
@@ -48,6 +50,7 @@ class ViewController: UIViewController {
     private var brain = CalculatorBrain()
     
     @IBAction private func performOperation(_ sender: UIButton) {
+        usingDotButton = false
         if userInMiddleOfTyping {
             brain.setOperand(operand: displayValue)
             userInMiddleOfTyping = false
@@ -55,6 +58,7 @@ class ViewController: UIViewController {
         
         if let mathOp = sender.currentTitle {
             brain.performOperation(symbol: mathOp)
+            displayOrder.text = brain.finalWritingDisplay()
         }
         displayValue = brain.result
     }
