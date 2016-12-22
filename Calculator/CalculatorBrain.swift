@@ -1,10 +1,13 @@
 //
+//  Code build from Stanford University's CS193P Class
+//
 //  CalculatorBrain.swift
 //  Calculator
 //
 //  Created by Alexander Kim on 12/20/16.
 //  Copyright © 2016 Alexander Kim. All rights reserved.
 //
+
 
 import Foundation
 
@@ -14,11 +17,13 @@ class CalculatorBrain {
     private var pending: PendingBinary?
     private var description = " "
     private var isPartialResult = true
+    private var bigExpression = false
     
     func setOperand(operand: Double) {
         accumulator = operand
     }
     
+    //dictionary of strings to their operations
     private var operations: Dictionary<String,Operation> = [
         "π": Operation.Constant(M_PI),
         "e": Operation.Constant(M_E),
@@ -29,13 +34,14 @@ class CalculatorBrain {
         "tan": Operation.UnaryOperation(tan),
         "log": Operation.UnaryOperation(log10),
         "×": Operation.BinaryOperation(*),
-        "+": Operation.BinaryOperation(/),
-        "÷": Operation.BinaryOperation(+),
+        "+": Operation.BinaryOperation(+),
+        "÷": Operation.BinaryOperation(/),
         "-": Operation.BinaryOperation(-), //subtraction has some rounding issues
         "^": Operation.BinaryOperation(pow),
         "=": Operation.Equals
     ]
     
+    //enum for four different cases
     private enum Operation {
         case Constant(Double)
         case UnaryOperation((Double) -> Double)
@@ -43,6 +49,7 @@ class CalculatorBrain {
         case Equals
     }
     
+    //performs the operation and updates the two different displays
     func performOperation(symbol: String) {
         if let operation = operations[symbol] {
             switch operation {
@@ -50,27 +57,31 @@ class CalculatorBrain {
                 description = symbol
                 accumulator = value
                 isPartialResult = true
+                bigExpression = false
             case .UnaryOperation(let function):
                 description = symbol + "(\(description))"
                 accumulator = function(accumulator)
                 isPartialResult = true
+                bigExpression = true
             case .BinaryOperation(let function):
-                if description != " " {
-                    description += symbol
+                writePendingBinary()
+                if !bigExpression {
+                    description = "\(accumulator) " + symbol
                 } else {
-                    description = "(\(description) " + symbol
+                    description = "(\(description)) " + symbol
                 }
                 excecutePendingBinary()
                 pending = PendingBinary(binaryFunction: function,firstOperand: accumulator)
                 isPartialResult = true
             case .Equals:
-                description = writePendingBinary()
+                writePendingBinary()
                 excecutePendingBinary()
                 isPartialResult = false
             }
         }
     }
     
+    //executes the binary operation
     private func excecutePendingBinary() {
         if pending != nil {
             accumulator = pending!.binaryFunction(pending!.firstOperand,accumulator)
@@ -78,11 +89,11 @@ class CalculatorBrain {
         }
     }
     
-    private func writePendingBinary() -> String {
+    //writes the binary operation to the bottom display
+    private func writePendingBinary() {
         if pending != nil {
-            return description + " \(accumulator)"
-        } else {
-            return description
+            description += " \(accumulator)"
+            bigExpression = true
         }
     }
     
@@ -97,11 +108,21 @@ class CalculatorBrain {
         }
     }
     
+    //returns a string value of the operations used to get the top display
     func finalWritingDisplay() -> String {
         if isPartialResult {
-            return description + "..."
+            return description + " ..."
         } else {
-            return description + "="
+            return description + " ="
         }
+    }
+    
+    //function that resets calculator on clear
+    func reset() {
+        accumulator = 0.0
+        pending = nil
+        description = " "
+        isPartialResult = true
+        bigExpression = false
     }
 }
