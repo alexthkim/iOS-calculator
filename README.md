@@ -25,3 +25,7 @@ I implemented several different parts of the working calculator:
 6. **"C" button** - Clears/resets the calculators history and output
 
 Note: Swift's precision is a bit off so subtraction doesn't work as properly intended
+
+##Running the project
+
+Download the project and open the xcode file (Calculator.xcodeproj) in xcode.
