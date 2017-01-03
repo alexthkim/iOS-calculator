@@ -18,9 +18,11 @@ class CalculatorBrain {
     private var description = " "
     private var isPartialResult = true
     private var bigExpression = false
+    private var internalProgram = [AnyObject]()
     
     func setOperand(operand: Double) {
         accumulator = operand
+        internalProgram.append(operand as AnyObject)
     }
     
     //dictionary of strings to their operations
@@ -51,6 +53,7 @@ class CalculatorBrain {
     
     //performs the operation and updates the two different displays
     func performOperation(symbol: String) {
+        internalProgram.append(symbol as AnyObject)
         if let operation = operations[symbol] {
             switch operation {
             case .Constant(let value):
@@ -102,6 +105,28 @@ class CalculatorBrain {
         var firstOperand: Double
     }
     
+    typealias PropertyList = AnyObject
+    
+    var program: PropertyList {
+        get {
+            return internalProgram as AnyObject
+        }
+        set {
+            reset()
+            if let arrayOfOps = newValue as? [AnyObject] {
+                for op in arrayOfOps {
+                    if let operand = op as? Double {
+                        setOperand(operand: operand)
+                    }
+                    if let operation = op as? String {
+                        performOperation(symbol: operation)
+                    }
+                }
+            }
+        }
+    }
+
+    
     var result: Double {
         get {
             return accumulator
@@ -124,5 +149,6 @@ class CalculatorBrain {
         description = " "
         isPartialResult = true
         bigExpression = false
+        internalProgram.removeAll()
     }
 }

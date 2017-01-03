@@ -55,6 +55,18 @@ class ViewController: UIViewController {
         }
     }
     
+    var savedProgram : CalculatorBrain.PropertyList?
+    @IBAction func save() {
+        savedProgram = brain.program
+    }
+    
+    @IBAction func restore() {
+        if savedProgram != nil {
+            brain.program = savedProgram!
+            displayValue = brain.result 
+        }
+    }
+    
     //gives functionality to pressing the C (clear) button
     @IBAction func clearAll(_ sender: UIButton) {
         display.text = "0"
